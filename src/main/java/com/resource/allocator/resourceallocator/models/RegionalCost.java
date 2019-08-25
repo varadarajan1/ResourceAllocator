@@ -19,7 +19,7 @@ public class RegionalCost implements Comparable<RegionalCost>{
     @JsonIgnore
     private Float totalCost;
     private @Singular
-    List<Map<String, Integer>> serverTypes;
+    List<Map.Entry<String, Integer>> serverTypes;
 
     @Override
     public int compareTo(RegionalCost regionalCost) {

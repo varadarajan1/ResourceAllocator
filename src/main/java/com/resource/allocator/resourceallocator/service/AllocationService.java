@@ -1,11 +1,10 @@
 package com.resource.allocator.resourceallocator.service;
 
-import com.resource.allocator.resourceallocator.models.RegionalCost;
+import com.resource.allocator.resourceallocator.models.Cost;
 import com.resource.allocator.resourceallocator.models.Server;
 import com.resource.allocator.resourceallocator.models.ServerType;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,46 +13,78 @@ import java.util.stream.Collectors;
 @Service
 public class AllocationService {
 
-    public RegionalCost getCosts(String region, Map<String, Float> serverCostsMap, Integer minCpus, Integer hours, Float maxCost) {
+    public Cost getCosts(Map<String, Float> serverCostsMap, Integer minCpus, Integer hours, Float maxCost) {
 
         List<Server> servers = getServers(serverCostsMap, hours);
+        if (maxCost != null && minCpus != null) {
+            return getCosts(servers, minCpus, maxCost);
+        } else if (minCpus != null)
+            return getCosts(servers, minCpus);
+        else if (maxCost != null)
+            return getCosts(servers, maxCost);
 
-//        maxCost = (maxCost == null) ? Integer.MIN_VALUE : maxCost;
-        minCpus = (minCpus == null) ? Integer.MIN_VALUE : minCpus;
+        return new Cost(0, new HashMap<String, Integer>(), 0f);
+    }
 
-        Float cost = 0.0f;
+    private Cost getCosts(List<Server> servers, Integer minCpus) {
+        Float totalCost = 0.0f;
         int allocatedCpus = 0;
-
-        List<Map<String, Integer>> instances = new ArrayList<>();
-
+        Map<String, Integer> serverInstanceMap = new HashMap<>();
         for (Server server :
                 servers) {
-
-            int serverCpus = server.getServerType().getNumberOfCpus();
-            int serverInstances = (minCpus - allocatedCpus) / serverCpus;
-
             float serverCost = server.getCost();
-//            int costOfInstances = (int)((maxCost - cost)/server.getCost());
+            int serverCpus = server.getServerType().getNumberOfCpus();
 
-            if (serverInstances > 0) {
-                cost += serverInstances * serverCost;
-                allocatedCpus += serverInstances * serverCpus;
-                server.setAllocatedInstances(serverInstances);
-                Map<String, Integer> serverInstanceMap = new HashMap<>();
-                serverInstanceMap.put(server.getServerType().getName(), serverInstances);
-                instances.add(serverInstanceMap);
+            /* Get Server instances required By Number Of Cpus required*/
+            int serverInstancesByCpu = getServerInstancesByCpu(minCpus, allocatedCpus, serverCpus);
+
+            if (serverInstancesByCpu > 0) {
+                totalCost += serverInstancesByCpu * serverCost;
+                allocatedCpus += serverInstancesByCpu * serverCpus;
+                server.setAllocatedInstances(serverInstancesByCpu);
+                serverInstanceMap.put(server.getServerType().getName(), serverInstancesByCpu);
             }
-
-//            if(costOfInstances>0){
-//                cost += costOfInstances * serverCost;
-//                server.setAllocatedInstances(costOfInstances);
-//                Map<String, Integer> serverInstanceMap = new HashMap<>();
-//                serverInstanceMap.put(server.getServerType().getName(), costOfInstances);
-//                instances.add(serverInstanceMap);
-//            }
         }
 
-        return RegionalCost.builder().region(region).totalCost(cost).serverTypes(instances).build();
+        return Cost.builder().totalCost(totalCost).totalNumberOfCpus(allocatedCpus).serverTypeWithCount(serverInstanceMap).build();
+    }
+
+    private Cost getCosts(List<Server> servers, Float maxCost) {
+        Float totalCost = 0.0f;
+        int allocatedCpus = 0;
+        Map<String, Integer> serverInstanceMap = new HashMap<>();
+        for (Server server :
+                servers) {
+            float serverCost = server.getCost();
+            int serverCpus = server.getServerType().getNumberOfCpus();
+
+            /* Get Server instances required By max cost required*/
+            int serverInstancesByCost = getInstancesByCost(maxCost, totalCost, server);
+
+            if (serverInstancesByCost > 0) {
+                totalCost += serverInstancesByCost * serverCost;
+                allocatedCpus += serverInstancesByCost * serverCpus;
+                server.setAllocatedInstances(serverInstancesByCost);
+                serverInstanceMap.put(server.getServerType().getName(), serverInstancesByCost);
+            }
+        }
+        return Cost.builder().totalCost(totalCost).totalNumberOfCpus(allocatedCpus).serverTypeWithCount(serverInstanceMap).build();
+    }
+
+    private Cost getCosts(List<Server> servers, Integer minCpus, Float maxCost) {
+        Cost cost = getCosts(servers, maxCost);
+        if (cost.getTotalNumberOfCpus() < minCpus)
+            return new Cost(0, new HashMap<String, Integer>(), 0f);
+        return cost;
+    }
+
+    private int getInstancesByCost(Float maxCost, Float cost, Server server) {
+        return (int) ((maxCost - cost) / server.getCost());
+    }
+
+    private int getServerInstancesByCpu(Integer minCpus, int allocatedCpus, int serverCpus) {
+        int diffCpus = minCpus - allocatedCpus;
+        return serverCpus > diffCpus ? (serverCpus % diffCpus) : (diffCpus) / serverCpus;
     }
 
     /* Returns a list of Servers sorted in ascending order by their cost to core ration */
