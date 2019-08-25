@@ -1,5 +1,6 @@
 package com.resource.allocator.resourceallocator.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetCostResponse {
+    @JsonProperty("costs")
     private List<RegionalCost> regionalCosts;
 }

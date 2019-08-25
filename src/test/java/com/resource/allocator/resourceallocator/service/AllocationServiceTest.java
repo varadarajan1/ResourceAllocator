@@ -22,7 +22,7 @@ public class AllocationServiceTest {
 
         int cpus = 1, hours = 1;
 
-        Cost cost = service.getCosts(serverCostsMap, cpus, hours, null);
+        Cost cost = service.getCosts(serverCostsMap, cpus, null, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -44,7 +44,7 @@ public class AllocationServiceTest {
 
         int cpus = 1, hours = 1;
 
-        Cost cost = service.getCosts(serverCostsMap, cpus, hours, null);
+        Cost cost = service.getCosts(serverCostsMap, cpus, null, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -64,7 +64,7 @@ public class AllocationServiceTest {
 
         int cpus = 3, hours = 1;
 
-        Cost cost = service.getCosts(serverCostsMap, cpus, hours, null);
+        Cost cost = service.getCosts(serverCostsMap, cpus, null, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -89,7 +89,7 @@ public class AllocationServiceTest {
         int cpus = 89, hours = 1;
         Float expectedCost = 7.894f; // 5 of 8x, 1 of 4x and 1 of large
 
-        Cost cost = service.getCosts(serverCostsMap, cpus, hours, null);
+        Cost cost = service.getCosts(serverCostsMap, cpus, null, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -115,7 +115,7 @@ public class AllocationServiceTest {
         float maxCost = 15.00f;
         int expectedCount = (int) (15 / (0.12 * 4));
 
-        Cost cost = service.getCosts(serverCostsMap, null, hours, maxCost);
+        Cost cost = service.getCosts(serverCostsMap, null, maxCost, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -141,7 +141,7 @@ public class AllocationServiceTest {
         float maxCost = 8f;
         Integer expectedCpu = 89;
 
-        Cost cost = service.getCosts(serverCostsMap, null, hours, maxCost);
+        Cost cost = service.getCosts(serverCostsMap, null, maxCost, hours);
 
         assertNotNull(cost);
         assertTrue(cost.getTotalCost()<=maxCost);
@@ -167,7 +167,7 @@ public class AllocationServiceTest {
         Float expectedCost = 0f;
         Integer expectedCpu = 0;
 
-        Cost cost = service.getCosts(serverCostsMap, null, hours, maxCost);
+        Cost cost = service.getCosts(serverCostsMap, null, maxCost, hours);
 
         assertNotNull(cost);
         assertEquals(cost.getTotalCost(), expectedCost);
@@ -186,7 +186,7 @@ public class AllocationServiceTest {
         float maxCost = 15.00f;
         int min = 16;
 
-        Cost cost = service.getCosts(serverCostsMap, min, hours, maxCost);
+        Cost cost = service.getCosts(serverCostsMap, min, maxCost, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -211,7 +211,7 @@ public class AllocationServiceTest {
         float maxCost = 8f;
         Integer min = 89;
 
-        Cost cost = service.getCosts(serverCostsMap, min, hours, maxCost);
+        Cost cost = service.getCosts(serverCostsMap, min, maxCost, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
@@ -239,7 +239,7 @@ public class AllocationServiceTest {
         Integer expectedCpu = 0;
         int min = 16;
 
-        Cost cost = service.getCosts(serverCostsMap, min, hours, maxCost);
+        Cost cost = service.getCosts(serverCostsMap, min, maxCost, hours);
 
         assertNotNull(cost);
         assertEquals(cost.getTotalCost(), expectedCost);
@@ -258,7 +258,7 @@ public class AllocationServiceTest {
         Float expectedCost = 0f;
         Integer expectedCpu = 0;
 
-        Cost cost = service.getCosts(serverCostsMap, null, hours, null);
+        Cost cost = service.getCosts(serverCostsMap, null, null, hours);
 
         assertNotNull(cost);
         assertEquals(cost.getTotalCost(), expectedCost);
@@ -273,7 +273,7 @@ public class AllocationServiceTest {
         Float expectedCost = 0f;
         Integer expectedCpu = 0;
 
-        Cost cost = service.getCosts(serverCostsMap,2, hours, null);
+        Cost cost = service.getCosts(serverCostsMap,2, null, hours);
 
         assertNotNull(cost);
         assertEquals(cost.getTotalCost(), expectedCost);

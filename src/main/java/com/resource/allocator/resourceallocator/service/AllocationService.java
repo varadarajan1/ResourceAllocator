@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class AllocationService {
 
-    public Cost getCosts(Map<String, Float> serverCostsMap, Integer minCpus, Integer hours, Float maxCost) {
+    public Cost getCosts(Map<String, Float> serverCostsMap, Integer minCpus, Float maxCost, Integer hours) {
 
         List<Server> servers = getServers(serverCostsMap, hours);
         if (maxCost != null && minCpus != null) {
@@ -34,6 +34,9 @@ public class AllocationService {
                 servers) {
             float serverCost = server.getCost();
             int serverCpus = server.getServerType().getNumberOfCpus();
+
+            if(allocatedCpus>=minCpus)
+                break;
 
             /* Get Server instances required By Number Of Cpus required*/
             int serverInstancesByCpu = getServerInstancesByCpu(minCpus, allocatedCpus, serverCpus);
@@ -57,6 +60,9 @@ public class AllocationService {
                 servers) {
             float serverCost = server.getCost();
             int serverCpus = server.getServerType().getNumberOfCpus();
+
+            if(maxCost<=totalCost)
+                break;
 
             /* Get Server instances required By max cost required*/
             int serverInstancesByCost = getInstancesByCost(maxCost, totalCost, server);

@@ -2,6 +2,7 @@ package com.resource.allocator.resourceallocator.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonPropertyOrder({"region","total_cost","servers"})
 public class RegionalCost implements Comparable<RegionalCost>{
     private String region;
     @Getter(AccessLevel.NONE)
@@ -18,8 +20,9 @@ public class RegionalCost implements Comparable<RegionalCost>{
     private String totalCostInDollars;
     @JsonIgnore
     private Float totalCost;
-    private @Singular
-    List<Map.Entry<String, Integer>> serverTypes;
+    @Singular
+    @JsonProperty("servers")
+    private List<Map.Entry<String, Integer>> serverTypes;
 
     @Override
     public int compareTo(RegionalCost regionalCost) {
