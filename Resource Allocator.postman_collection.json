@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "af48525c-03ca-49f4-a33f-60a0924da94a",
+		"name": "Resource Allocator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetCosts",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"hours\": \"1\",\n    \"price\":\"8\",\n    \"instances\": {\n        \"us-east\": {\n            \"Large\": \"0.12\",\n            \"xLarge\": \"0.23\",\n            \"2xLarge\": \"0.45\",\n            \"4xLarge\": \"0.774\",\n            \"8xLarge\": \"1.4\"\n        },\n        \"us-west\": {\n            \"Large\": \"0.12\",\n            \"2xLarge\": \"0.45\",\n            \"4xLarge\": \"0.774\",\n            \"8xLarge\": \"2.4\"\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "https://resourceallocator289.herokuapp.com/allocations/costs",
+					"protocol": "https",
+					"host": [
+						"resourceallocator289",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"allocations",
+						"costs"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
