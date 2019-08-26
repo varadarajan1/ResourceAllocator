@@ -12,24 +12,9 @@ jobs:
       language: java
       jdk: oraclejdk8
       script: ./gradlew clean build
-      before_deploy:
-        - git config --local user.name "Travis CI"
-        - git config --local user.email "travis@example.com"
-        - git tag -f $RELEASE_TAG
       deploy:
-        provider: releases
-        api_key: $GITHUB_OAUTH_TOKEN
+        provider: heroku
         file: "build/libs/resource-allocator-0.0.1-SNAPSHOT.jar"
         skip_cleanup: true
-    - stage: deploy to azure
-      script:
-        - echo "Downloading $RELEASE_TAG"
-        - wget -P build/libs https://github.com/$GITHUB_USERNAME/ResourceAllocator/releases/download/$RELEASE_TAG/resource-allocator-0.0.1-SNAPSHOT.jar
-      before_deploy:
-        - cp web.config /home/site/wwwroot/
-        - cd build/libs
-      deploy:
-        skip_cleanup: true
-        verbose: true
-        on: master
-        provider: azure_web_apps
+        api_key:
+          secure: $HEROKU_API_KEY
