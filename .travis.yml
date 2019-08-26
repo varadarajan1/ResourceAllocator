@@ -1,8 +1,30 @@
-deploy:
-  on: production
-  provider: azure_web_apps
-  username: $azure_deployment_user       # If AZURE_WA_USERNAME isn't set
-  password: $azure_deployment_password   # If AZURE_WA_PASSWORD isn't set
-  site: $azure_deployment_sitename       # If AZURE_WA_SITE isn't set
-  slot: $azure_deployment_slotname       # (optional) If AZURE_WA_SLOT isn't set
+dist: trusty
+sudo: false
+notifications:
+  email: false
+env:
+  - RELEASE_TAG="release-$TRAVIS_BUILD_NUMBER"
+if: tag IS blank
 
+jobs:
+  include:
+    - stage: build and publish
+      language: java
+      jdk: openjdk11
+      script: ./gradlew clean build
+      before_deploy:
+        - git config --local user.name "Travis CI"
+        - git config --local user.email "travis@example.com"
+        - git tag -f $RELEASE_TAG
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        file: "build/libs/resource-allocator-0.0.1-SNAPSHOT.jar"
+        skip_cleanup: true
+    - stage: deploy to azure
+      script:
+        - echo "Downloading $RELEASE_TAG"
+        - wget -P build/libs https://github.com/$GITHUB_USERNAME/pal-tracker/releases/download/$RELEASE_TAG/resource-allocator-0.0.1-SNAPSHOT.jar
+      deploy:
+        on: production
+        provider: azure_web_apps
