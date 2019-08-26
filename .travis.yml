@@ -26,6 +26,7 @@ jobs:
         - echo "Downloading $RELEASE_TAG"
         - wget -P build/libs https://github.com/$GITHUB_USERNAME/ResourceAllocator/releases/download/$RELEASE_TAG/resource-allocator-0.0.1-SNAPSHOT.jar
       before_deploy:
+        - cp web.config /home/site/wwwroot/
         - cd build/libs
       deploy:
         skip_cleanup: true
