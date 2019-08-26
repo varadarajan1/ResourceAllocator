@@ -5,6 +5,7 @@ import com.resource.allocator.resourceallocator.models.Server;
 import com.resource.allocator.resourceallocator.models.ServerType;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,17 +30,23 @@ public class AllocationService {
     private Cost getCosts(List<Server> servers, Integer minCpus) {
         Float totalCost = 0.0f;
         int allocatedCpus = 0;
+        int minServerCpus = servers.stream().mapToInt(x -> x.getServerType().getNumberOfCpus()).min().orElse(0);
         Map<String, Integer> serverInstanceMap = new HashMap<>();
         for (Server server :
                 servers) {
             float serverCost = server.getCost();
             int serverCpus = server.getServerType().getNumberOfCpus();
 
-            if(allocatedCpus>=minCpus)
+            if (allocatedCpus >= minCpus)
                 break;
 
             /* Get Server instances required By Number Of Cpus required*/
-            int serverInstancesByCpu = getServerInstancesByCpu(minCpus, allocatedCpus, serverCpus);
+            int cpusToBeAllocated = minCpus - allocatedCpus;
+
+            int serverInstancesByCpu = getServerInstancesByCpu(cpusToBeAllocated, serverCpus);
+
+            if (cpusToBeAllocated < minServerCpus && server.getServerType().getNumberOfCpus() == minServerCpus)
+                serverInstancesByCpu = 1;
 
             if (serverInstancesByCpu > 0) {
                 totalCost += serverInstancesByCpu * serverCost;
@@ -61,7 +68,7 @@ public class AllocationService {
             float serverCost = server.getCost();
             int serverCpus = server.getServerType().getNumberOfCpus();
 
-            if(maxCost<=totalCost)
+            if (maxCost <= totalCost)
                 break;
 
             /* Get Server instances required By max cost required*/
@@ -88,9 +95,8 @@ public class AllocationService {
         return (int) ((maxCost - cost) / server.getCost());
     }
 
-    private int getServerInstancesByCpu(Integer minCpus, int allocatedCpus, int serverCpus) {
-        int diffCpus = minCpus - allocatedCpus;
-        return serverCpus > diffCpus ? (serverCpus % diffCpus) : (diffCpus) / serverCpus;
+    private int getServerInstancesByCpu(Integer cpusToBeAllocated, int serverCpus) {
+        return (cpusToBeAllocated) / serverCpus;
     }
 
     /* Returns a list of Servers sorted in ascending order by their cost to core ration */

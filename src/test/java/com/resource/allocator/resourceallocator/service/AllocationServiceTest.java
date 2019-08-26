@@ -55,23 +55,24 @@ public class AllocationServiceTest {
     }
 
     @Test
-    public void whenRequestHasOddNumberOfCpus_AndHoursWithOneServerTypeHavingEvenNumberOfCpus() {
+    public void whenServerWithMinimumNumberOfCpusIsNotAvailable_shouldReturnNextServerWithMinimumCpus() {
         Map<String, Float> serverCostsMap = new HashMap() {
             {
-                put("2xLarge", 0.12f);
+                put("8xLarge", 0.12f);
+                put("16xLarge",0.44f);
             }
         };
 
-        int cpus = 3, hours = 1;
+        int cpus = 2, hours = 1;
 
         Cost cost = service.getCosts(serverCostsMap, cpus, null, hours);
 
         assertNotNull(cost);
         assertNotNull(cost.getServerTypeWithCount());
         assertNotNull(cost.getTotalCost());
-        assertEquals(serverCostsMap.get("2xLarge"), cost.getTotalCost());
-        assertTrue(cost.getServerTypeWithCount().containsKey("2xLarge"));
-        assertTrue(cost.getServerTypeWithCount().get("2xLarge").equals(1));
+        assertEquals(serverCostsMap.get("8xLarge"), cost.getTotalCost());
+        assertTrue(cost.getServerTypeWithCount().containsKey("8xLarge"));
+        assertTrue(cost.getServerTypeWithCount().get("8xLarge").equals(1));
     }
 
     @Test

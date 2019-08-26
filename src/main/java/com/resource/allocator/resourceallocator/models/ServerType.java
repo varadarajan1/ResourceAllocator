@@ -12,14 +12,14 @@ public enum ServerType {
 
 
     private String name;
-    private int cpu;
+    private Integer cpu;
 
-    ServerType(String name, int cpu) {
+    ServerType(String name, Integer cpu) {
         this.name = name;
         this.cpu = cpu;
     }
 
-    public int getNumberOfCpus() {
+    public Integer getNumberOfCpus() {
         return this.cpu;
     }
 
